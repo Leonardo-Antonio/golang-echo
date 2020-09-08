@@ -35,7 +35,7 @@ func (c *Course) Create(course model.Course) error {
 	defer stmt.Close()
 
 	rs, err := stmt.Exec(
-		course.Name,
+		storage.StringNull(course.Name),
 		course.Active,
 		storage.StringNull(course.Teacher),
 	)

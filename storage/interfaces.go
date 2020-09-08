@@ -9,6 +9,7 @@ type (
 		GetAll() ([]model.Course, error)
 		GetByID(int) (model.Course, error)
 		Update(int, model.Course) error
+		Delete(int) error
 	}
 
 	// User -> interface implemented in handlers
