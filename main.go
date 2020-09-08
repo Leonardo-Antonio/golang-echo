@@ -3,10 +3,12 @@ package main
 import (
 	"log"
 
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+
 	"github.com/Leonardo-Antonio/golang-echo/router"
 	"github.com/Leonardo-Antonio/golang-echo/storage/connections"
 	"github.com/Leonardo-Antonio/golang-echo/storage/course"
-	"github.com/labstack/echo"
 )
 
 func main() {
@@ -14,6 +16,7 @@ func main() {
 	courseStore := course.New(db)
 
 	e := echo.New()
+	e.Use(middleware.Logger())
 	router.Course(courseStore, e)
 
 	log.Println("Servidor corriendo en el puerto :8080")
