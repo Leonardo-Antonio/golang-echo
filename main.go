@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 
+	"github.com/Leonardo-Antonio/golang-echo/certificates/authorization"
+
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 
@@ -12,6 +14,12 @@ import (
 )
 
 func main() {
+
+	err := authorization.LoadFiles("certificates/app.rsa", "certificates/app.rsa.pub")
+	if err != nil {
+		log.Fatalf("No se pudo cargar los certificados -> %v", err)
+	}
+
 	db := connections.Mysql()
 	courseStore := course.New(db)
 
@@ -21,7 +29,7 @@ func main() {
 
 	log.Println("Servidor corriendo en el puerto :8080")
 
-	err := e.Start(":8080")
+	err = e.Start(":8080")
 	if err != nil {
 		log.Fatalf("Error en el servidor -> %+v\n", err)
 	}
