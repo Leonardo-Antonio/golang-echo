@@ -2,7 +2,6 @@ package user
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/Leonardo-Antonio/golang-echo/storage"
 
@@ -65,7 +64,6 @@ func (u *User) LogIn(user model.User) (data model.User, err error) {
 		&data.Email,
 	)
 	if err != nil {
-		fmt.Println(err)
 		return data, storage.ErrorNotExistUser
 	}
 	return
