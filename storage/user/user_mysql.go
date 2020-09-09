@@ -2,6 +2,7 @@ package user
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/Leonardo-Antonio/golang-echo/storage"
 
@@ -59,8 +60,9 @@ func (u *User) LogIn(user model.User) (id int, err error) {
 	}
 	defer stmt.Close()
 
-	err = stmt.QueryRow(user.Email, user.Password).Scan(id)
+	err = stmt.QueryRow(user.Email, user.Password).Scan(&id)
 	if err != nil {
+		fmt.Println(err)
 		return 0, storage.ErrorNotExistUser
 	}
 	return
