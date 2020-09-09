@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Leonardo-Antonio/golang-echo/certificates/authorization"
 	"github.com/Leonardo-Antonio/golang-echo/model"
 
 	"github.com/labstack/echo"
@@ -57,12 +58,12 @@ func (u *User) LogIn(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	id, err := u.storage.LogIn(data)
+	data, err = u.storage.LogIn(data)
 	if errors.Is(err, storage.ErrorNotExistUser) {
 		response := newResponse(ERROR, "El usuario o el password son incorrectos", nil)
 		return c.JSON(http.StatusBadRequest, response)
 	}
-	if id <= 0 {
+	if data.ID <= 0 {
 		response := newResponse(ERROR, "El usuario no existe", nil)
 		return c.JSON(http.StatusBadRequest, response)
 	}
@@ -70,8 +71,13 @@ func (u *User) LogIn(c echo.Context) error {
 		response := newResponse(ERROR, "Ha ocurrido un error en la bd", nil)
 		return c.JSON(http.StatusInternalServerError, response)
 	}
+	token, err := authorization.GenerateToken(&data)
+	if err != nil {
+		response := newResponse(ERROR, "Error al generar el token", nil)
+		return c.JSON(http.StatusInternalServerError, response)
+	}
 
-	response := newResponse(MESSAGE, "OK", nil)
+	response := newResponse(MESSAGE, "OK", map[string]string{"token": token})
 	return c.JSON(http.StatusOK, response)
 }
 
