@@ -6,11 +6,11 @@ import (
 	"github.com/Leonardo-Antonio/golang-echo/certificates/authorization"
 
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
 
 	"github.com/Leonardo-Antonio/golang-echo/router"
 	"github.com/Leonardo-Antonio/golang-echo/storage/connections"
 	"github.com/Leonardo-Antonio/golang-echo/storage/course"
+	"github.com/Leonardo-Antonio/golang-echo/storage/user"
 )
 
 func main() {
@@ -22,10 +22,12 @@ func main() {
 
 	db := connections.Mysql()
 	courseStore := course.New(db)
+	UserStore := user.New(db)
 
 	e := echo.New()
-	e.Use(middleware.Logger())
+	//e.Use(middleware.Logger())
 	router.Course(courseStore, e)
+	router.User(UserStore, e)
 
 	log.Println("Servidor corriendo en el puerto :8080")
 
