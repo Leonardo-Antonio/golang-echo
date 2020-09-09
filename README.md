@@ -15,7 +15,7 @@
 
 ```shell
 > mysql -u (user) -p(password)
-> sourse model/database/mysql.sql
+> source model/database/mysql.sql
 ```
 
 # Run application
