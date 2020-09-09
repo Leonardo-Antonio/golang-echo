@@ -28,24 +28,29 @@ func (u *User) SignIn(c echo.Context) error {
 	data := model.User{}
 	err := c.Bind(&data)
 	if err != nil {
-		response := newResponse(ERROR, "La estructura no es la correcta", nil)
+		i := info{Code: http.StatusBadRequest, Path: c.Path(), Method: "POST"}
+		response := newResponse(ERROR, "La estructura no es la correcta", nil, i)
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	err = u.storage.SignIn(data)
 	if errors.Is(err, storage.ErrorRowNull) {
-		response := newResponse(ERROR, "No se aceptan datos nulos", nil)
+		i := info{Code: http.StatusBadRequest, Path: c.Path(), Method: "POST"}
+		response := newResponse(ERROR, "No se aceptan datos nulos", nil, i)
 		return c.JSON(http.StatusBadRequest, response)
 	}
 	if errors.Is(err, storage.ErrorRowAffected) {
-		response := newResponse(ERROR, "No se pudo crear el nuevo usuario", nil)
+		i := info{Code: http.StatusBadRequest, Path: c.Path(), Method: "POST"}
+		response := newResponse(ERROR, "No se pudo crear el nuevo usuario", nil, i)
 		return c.JSON(http.StatusBadRequest, response)
 	}
 	if err != nil {
-		response := newResponse(ERROR, "Ha ocurrido un error en la bd", nil)
+		i := info{Code: http.StatusInternalServerError, Path: c.Path(), Method: "POST"}
+		response := newResponse(ERROR, "Ha ocurrido un error en la bd", nil, i)
 		return c.JSON(http.StatusInternalServerError, response)
 	}
-	response := newResponse(MESSAGE, "OK", nil)
+	i := info{Code: http.StatusOK, Path: c.Path(), Method: "POST"}
+	response := newResponse(MESSAGE, "OK", nil, i)
 	return c.JSON(http.StatusOK, response)
 }
 
@@ -54,30 +59,36 @@ func (u *User) LogIn(c echo.Context) error {
 	data := model.User{}
 	err := c.Bind(&data)
 	if err != nil {
-		response := newResponse(ERROR, "La estructura no es la correcta", nil)
+		i := info{Code: http.StatusBadRequest, Path: c.Path(), Method: "POST"}
+		response := newResponse(ERROR, "La estructura no es la correcta", nil, i)
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	data, err = u.storage.LogIn(data)
 	if errors.Is(err, storage.ErrorNotExistUser) {
-		response := newResponse(ERROR, "El usuario o el password son incorrectos", nil)
+		i := info{Code: http.StatusBadRequest, Path: c.Path(), Method: "POST"}
+		response := newResponse(ERROR, "El usuario o el password son incorrectos", nil, i)
 		return c.JSON(http.StatusBadRequest, response)
 	}
 	if data.ID <= 0 {
-		response := newResponse(ERROR, "El usuario no existe", nil)
+		i := info{Code: http.StatusBadRequest, Path: c.Path(), Method: "POST"}
+		response := newResponse(ERROR, "El usuario no existe", nil, i)
 		return c.JSON(http.StatusBadRequest, response)
 	}
 	if err != nil {
-		response := newResponse(ERROR, "Ha ocurrido un error en la bd", nil)
+		i := info{Code: http.StatusInternalServerError, Path: c.Path(), Method: "POST"}
+		response := newResponse(ERROR, "Ha ocurrido un error en la bd", nil, i)
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 	token, err := authorization.GenerateToken(&data)
 	if err != nil {
-		response := newResponse(ERROR, "Error al generar el token", nil)
+		i := info{Code: http.StatusInternalServerError, Path: c.Path(), Method: "POST"}
+		response := newResponse(ERROR, "Error al generar el token", nil, i)
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
-	response := newResponse(MESSAGE, "OK", map[string]string{"token": token})
+	i := info{Code: http.StatusOK, Path: c.Path(), Method: "POST"}
+	response := newResponse(MESSAGE, "OK", map[string]string{"token": token}, i)
 	return c.JSON(http.StatusOK, response)
 }
 
@@ -85,32 +96,38 @@ func (u *User) LogIn(c echo.Context) error {
 func (u *User) Update(c echo.Context) error {
 	ID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		response := newResponse(ERROR, "El id debe ser un número entero", nil)
+		i := info{Code: http.StatusBadRequest, Path: c.Path(), Method: "POST"}
+		response := newResponse(ERROR, "El id debe ser un número entero", nil, i)
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	data := model.User{}
 	err = c.Bind(&data)
 	if err != nil {
-		response := newResponse(ERROR, "La estructura no es la correcta", nil)
+		i := info{Code: http.StatusBadRequest, Path: c.Path(), Method: "POST"}
+		response := newResponse(ERROR, "La estructura no es la correcta", nil, i)
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	err = u.storage.Update(ID, data)
 	if errors.Is(err, storage.ErrorRowNull) {
-		response := newResponse(ERROR, "No se aceptan datos nulos", nil)
+		i := info{Code: http.StatusBadRequest, Path: c.Path(), Method: "POST"}
+		response := newResponse(ERROR, "No se aceptan datos nulos", nil, i)
 		return c.JSON(http.StatusBadRequest, response)
 	}
 	if errors.Is(err, storage.ErrorRowAffected) {
-		response := newResponse(ERROR, "No se pudo crear el nuevo usuario", nil)
+		i := info{Code: http.StatusBadRequest, Path: c.Path(), Method: "POST"}
+		response := newResponse(ERROR, "No se pudo crear el nuevo usuario", nil, i)
 		return c.JSON(http.StatusBadRequest, response)
 	}
 	if err != nil {
-		response := newResponse(ERROR, "Ha ocurrido un error en la bd", nil)
+		i := info{Code: http.StatusInternalServerError, Path: c.Path(), Method: "POST"}
+		response := newResponse(ERROR, "Ha ocurrido un error en la bd", nil, i)
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
-	response := newResponse(MESSAGE, "OK", nil)
+	i := info{Code: http.StatusOK, Path: c.Path(), Method: "POST"}
+	response := newResponse(MESSAGE, "OK", nil, i)
 	return c.JSON(http.StatusOK, response)
 }
 
@@ -118,20 +135,24 @@ func (u *User) Update(c echo.Context) error {
 func (u *User) Delete(c echo.Context) error {
 	ID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		response := newResponse(ERROR, "El id debe ser un número entero", nil)
+		i := info{Code: http.StatusBadRequest, Path: c.Path(), Method: "POST"}
+		response := newResponse(ERROR, "El id debe ser un número entero", nil, i)
 		return c.JSON(http.StatusBadRequest, response)
 	}
 	err = u.storage.Delete(ID)
 	if errors.Is(err, storage.ErrorRowAffected) {
-		response := newResponse(ERROR, "No se encontro el usuario", nil)
+		i := info{Code: http.StatusBadRequest, Path: c.Path(), Method: "POST"}
+		response := newResponse(ERROR, "No se encontro el usuario", nil, i)
 		return c.JSON(http.StatusBadRequest, response)
 	}
 	if err != nil {
-		response := newResponse(ERROR, "Ha ocurrido un error en la bd", nil)
+		i := info{Code: http.StatusInternalServerError, Path: c.Path(), Method: "POST"}
+		response := newResponse(ERROR, "Ha ocurrido un error en la bd", nil, i)
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
-	response := newResponse(MESSAGE, "OK", nil)
+	i := info{Code: http.StatusOK, Path: c.Path(), Method: "POST"}
+	response := newResponse(MESSAGE, "OK", nil, i)
 	return c.JSON(http.StatusOK, response)
 
 }
