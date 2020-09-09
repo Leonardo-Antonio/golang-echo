@@ -11,7 +11,7 @@ import (
 
 const (
 	userCreate = "INSERT INTO tb_users VALUES (NULL, ?, ?)"
-	userLogin  = "SELECT id FROM tb_users WHERE email = ? AND pass = ?"
+	userLogin  = "SELECT id ,email FROM tb_users WHERE email = ? AND pass = ?"
 	userUpdate = "UPDATE tb_users SET email = ?, pass = ? WHERE id = ?"
 	userDelete = "DELETE FROM tb_users WHERE id = ?"
 )
@@ -53,17 +53,20 @@ func (u *User) SignIn(user model.User) error {
 }
 
 // LogIn -> verify user
-func (u *User) LogIn(user model.User) (id int, err error) {
+func (u *User) LogIn(user model.User) (data model.User, err error) {
 	stmt, err := u.db.Prepare(userLogin)
 	if err != nil {
 		return
 	}
 	defer stmt.Close()
 
-	err = stmt.QueryRow(user.Email, user.Password).Scan(&id)
+	err = stmt.QueryRow(user.Email, user.Password).Scan(
+		&data.ID,
+		&data.Email,
+	)
 	if err != nil {
 		fmt.Println(err)
-		return 0, storage.ErrorNotExistUser
+		return data, storage.ErrorNotExistUser
 	}
 	return
 }
