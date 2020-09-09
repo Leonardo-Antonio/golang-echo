@@ -15,7 +15,7 @@ type (
 	// User -> interface implemented in handlers
 	User interface {
 		SignIn(model.User) error
-		LogIn(model.User) (int, error)
+		LogIn(model.User) (model.User, error)
 		Update(int, model.User) error
 		Delete(int) error
 	}
