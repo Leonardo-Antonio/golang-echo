@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 
+	"github.com/labstack/echo/middleware"
+
 	"github.com/Leonardo-Antonio/golang-echo/certificates/authorization"
 
 	"github.com/labstack/echo"
@@ -25,7 +27,8 @@ func main() {
 	UserStore := user.New(db)
 
 	e := echo.New()
-	//e.Use(middleware.Logger())
+	e.Use(middleware.CORS())
+
 	router.Course(courseStore, e)
 	router.User(UserStore, e)
 
